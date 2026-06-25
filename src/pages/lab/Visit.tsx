@@ -18,7 +18,7 @@ export default function LabVisit() {
   const [visit, setVisit] = useState<any>(null);
   const [results, setResults] = useState<any[]>([]);
   const [assigned, setAssigned] = useState<any[]>([]);
-  const [n, setN] = useState({ test_name: "", result_value: "", reference_range: "", notes: "" });
+  const [n, setN] = useState({ test_name: "", result: "", reference_range: "", notes: "" });
 
   const load = async () => {
     const { data: v } = await supabase.from("visits").select("*,patients(*)").eq("id", id).single();
@@ -33,7 +33,7 @@ export default function LabVisit() {
   const addResult = async () => {
     if (!n.test_name) return;
     await supabase.from("lab_results").insert({ ...n, visit_id: id, patient_id: visit.patient_id });
-    setN({ test_name: "", result_value: "", reference_range: "", notes: "" });
+    setN({ test_name: "", result: "", reference_range: "", notes: "" });
     load();
     toast.success("Result added");
   };
@@ -61,7 +61,7 @@ export default function LabVisit() {
       <Card><CardContent className="p-4 space-y-3">
         <div className="grid md:grid-cols-4 gap-2 items-end">
           <div className="space-y-1"><Label>Test name</Label><Input value={n.test_name} onChange={(e) => setN({ ...n, test_name: e.target.value })} /></div>
-          <div className="space-y-1"><Label>Result</Label><Input value={n.result_value} onChange={(e) => setN({ ...n, result_value: e.target.value })} /></div>
+          <div className="space-y-1"><Label>Result</Label><Input value={n.result} onChange={(e) => setN({ ...n, result: e.target.value })} /></div>
           <div className="space-y-1"><Label>Reference</Label><Input value={n.reference_range} onChange={(e) => setN({ ...n, reference_range: e.target.value })} /></div>
           <Button onClick={addResult}><Plus className="h-4 w-4" /> Add Result</Button>
         </div>
@@ -70,7 +70,7 @@ export default function LabVisit() {
           <TableHeader><TableRow><TableHead>Test</TableHead><TableHead>Result</TableHead><TableHead>Range</TableHead><TableHead>Notes</TableHead></TableRow></TableHeader>
           <TableBody>
             {results.map((r) => (
-              <TableRow key={r.id}><TableCell className="font-medium">{r.test_name}</TableCell><TableCell>{r.result_value}</TableCell><TableCell>{r.reference_range}</TableCell><TableCell className="text-muted-foreground">{r.notes}</TableCell></TableRow>
+              <TableRow key={r.id}><TableCell className="font-medium">{r.test_name}</TableCell><TableCell>{r.result}</TableCell><TableCell>{r.reference_range}</TableCell><TableCell className="text-muted-foreground">{r.notes}</TableCell></TableRow>
             ))}
             {results.length === 0 && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground py-4">No results yet</TableCell></TableRow>}
           </TableBody>

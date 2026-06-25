@@ -69,12 +69,14 @@ export default function Payments() {
     await supabase.from("opd_records").update({ payment_locked: true }).eq("visit_id", paying.visit_id);
 
     // Advance visit to first service in sequence (or complete)
-    const visit = {
-      id: paying.visits?.id ?? paying.visit_id,
-      service_sequence: paying.visits?.service_sequence ?? [],
-      current_step_index: -1, // so advance() moves to index 0
-    };
-    await advance(visit);
+    const { data: freshVisit } = await supabase.from("visits")
+      .select("id,service_sequence,current_step_index")
+      .eq("id", paying.visits?.id ?? paying.visit_id)
+      .single();
+    if (freshVisit) {
+      // Reset to -1 so advance() moves to index 0 (first service)
+      await advance({ ...freshVisit, current_step_index: -1 });
+    }
 
     await audit("PAYMENT_COLLECTED", "payments", paying.id, { amount: paying.total_amount, method });
     toast.success("Payment confirmed");

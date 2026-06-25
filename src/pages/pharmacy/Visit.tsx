@@ -32,6 +32,7 @@ export default function PharmacyVisit() {
 
   const toggle = async (r: any, val: boolean) => {
     await supabase.from("prescriptions").update({
+      status: val ? "dispensed" : "pending",
       dispensed_at: val ? new Date().toISOString() : null,
       dispensed_by: val ? user?.id ?? null : null,
     }).eq("id", r.id);
@@ -67,7 +68,7 @@ export default function PharmacyVisit() {
                 <TableCell>{r.dosage}</TableCell>
                 <TableCell>{r.frequency}</TableCell>
                 <TableCell>{r.duration}</TableCell>
-                <TableCell><Badge variant={r.dispensed_at ? "default" : "secondary"}>{r.dispensed_at ? "dispensed" : "pending"}</Badge></TableCell>
+                <TableCell><Badge variant={r.status === "dispensed" ? "default" : "secondary"}>{r.status === "dispensed" ? "dispensed" : "pending"}</Badge></TableCell>
               </TableRow>
             ))}
             {rx.length === 0 && <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-6">No prescriptions</TableCell></TableRow>}

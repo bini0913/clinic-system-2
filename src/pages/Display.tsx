@@ -19,7 +19,7 @@ export default function Display() {
   const load = async () => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
     const { data } = await supabase.from("visits")
-      .select("id,token_number,status,patients(full_name)")
+      .select("id,token_number,status")
       .gte("created_at", start.toISOString());
     setRows(data ?? []);
   };
@@ -53,17 +53,16 @@ export default function Display() {
                 <div className="text-5xl font-bold font-mono mt-3 min-h-[60px]">
                   {waiting[0]?.token_number ?? "—"}
                 </div>
-                <div className="text-sm opacity-90 mt-1 truncate">
-                  {waiting[0]?.patients?.full_name ?? "Awaiting next patient"}
+                <div className="text-sm opacity-90 mt-1">
+                  Now serving
                 </div>
               </div>
               <div className="p-4 flex-1">
                 <div className="text-xs uppercase text-slate-400 mb-2">Up next</div>
                 <div className="space-y-1">
                   {waiting.slice(1, 6).map((v) => (
-                    <div key={v.id} className="flex items-center justify-between text-sm">
+                    <div key={v.id} className="flex items-center text-sm">
                       <span className="font-mono text-slate-200">{v.token_number}</span>
-                      <span className="text-slate-400 truncate ml-2">{v.patients?.full_name}</span>
                     </div>
                   ))}
                   {waiting.length <= 1 && <div className="text-sm text-slate-600">No one else waiting</div>}

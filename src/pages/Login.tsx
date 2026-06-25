@@ -38,7 +38,7 @@ export default function Login() {
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@clinic.com" />
+              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Enter your email" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="pwd">Password</Label>
@@ -48,11 +48,6 @@ export default function Login() {
               {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
-          <div className="mt-6 text-xs text-muted-foreground space-y-1">
-            <div className="font-medium text-foreground">Demo accounts (password: clinic2024)</div>
-            <div>admin@clinic.com · reception@clinic.com · opd@clinic.com</div>
-            <div>lab@clinic.com · treatment@clinic.com · pharmacy@clinic.com</div>
-          </div>
         </CardContent>
       </Card>
     </div>

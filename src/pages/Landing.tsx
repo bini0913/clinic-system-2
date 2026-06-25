@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useSettings } from "@/lib/settings";
 import {
   Stethoscope,
-  ClipboardList,
   UserPlus,
   FlaskConical,
   Syringe,

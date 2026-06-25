@@ -4,6 +4,7 @@ import { useAuth } from "@/lib/auth";
 import type { Role } from "@/lib/supabase";
 import Login from "@/pages/Login";
 import Display from "@/pages/Display";
+import Landing from "@/pages/Landing";
 import Layout from "@/components/Layout";
 import ReceptionDashboard from "@/pages/reception/Dashboard";
 import ReceptionPatients from "@/pages/reception/Patients";
@@ -48,6 +49,23 @@ function HomeRedirect() {
     pharmacy: "/pharmacy",
   };
   return <Navigate to={map[user.role]} replace />;
+}
+
+function RootRedirect() {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen bg-[#070C18]" />;
+  if (user) {
+    const map: Record<Role, string> = {
+      admin: "/admin",
+      reception: "/reception",
+      opd: "/opd",
+      laboratory: "/lab",
+      treatment: "/treatment",
+      pharmacy: "/pharmacy",
+    };
+    return <Navigate to={map[user.role]} replace />;
+  }
+  return <Landing />;
 }
 
 export default function App() {
@@ -95,7 +113,7 @@ export default function App() {
         <Route path="/admin/audit" element={<AdminAudit />} />
       </Route>
 
-      <Route path="/" element={<HomeRedirect />} />
+      <Route path="/" element={<RootRedirect />} />
       <Route path="*" element={<HomeRedirect />} />
     </Routes>
   );

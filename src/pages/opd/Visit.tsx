@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fmtETB, fmtDate, audit } from "@/lib/helpers";
+import { logActivity, notify } from "@/lib/activity";
 import { toast } from "sonner";
 import { Trash2, Plus, Send, Lock, ArrowUp, ArrowDown } from "lucide-react";
 
@@ -100,6 +101,7 @@ export default function OPDVisit() {
     if (existing) await supabase.from("opd_records").update(payload).eq("id", existing.id);
     else await supabase.from("opd_records").insert({ ...payload, status: "draft", payment_locked: false });
     await audit("OPD_SAVED", "opd_records", id as string);
+    await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "opd", action: "OPD notes saved" });
     toast.success("OPD record saved");
   };
 
@@ -146,11 +148,16 @@ export default function OPDVisit() {
         quantity: r.quantity ? Number(r.quantity) : null,
         instructions: r.instructions,
       })));
+      await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "opd", action: `Prescribed ${rx.length} medicine(s)`, details: { items: rx.map((r) => r.medicine_name) } });
     }
 
     const seqSet = new Set<string>(); const sequence: string[] = [];
     orders.forEach((o) => { if (!seqSet.has(o.type)) { seqSet.add(o.type); sequence.push(o.type); } });
     if (rx.length > 0 && !seqSet.has("pharmacy")) sequence.push("pharmacy");
+
+    if (orders.length > 0) {
+      await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "opd", action: `Assigned ${orders.length} service(s)`, details: { services: orders.map((o) => o.service_name) } });
+    }
 
     if (total > 0) {
       await supabase.from("payments").insert({
@@ -158,10 +165,16 @@ export default function OPDVisit() {
         services_breakdown: breakdown, total_amount: total, method: "cash", status: "pending",
       });
       await supabase.from("visits").update({ status: "pending_payment", service_sequence: sequence, current_step_index: 0 }).eq("id", id);
+      await notify({
+        to_role: "reception", from_role: "opd",
+        visit_id: id as string, patient_id: visit.patient_id,
+        message: `Payment request for ${visit.patients?.full_name} — ${total} ETB`,
+      });
     } else if (sequence.length > 0) {
       await supabase.from("visits").update({ status: `${sequence[0]}_waiting`, service_sequence: sequence, current_step_index: 0 }).eq("id", id);
     } else {
       await supabase.from("visits").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", id);
+      await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "opd", action: "Visit completed" });
     }
     await audit("OPD_SUBMITTED", "visits", id as string, { total, sequence });
     toast.success("Submitted to reception");

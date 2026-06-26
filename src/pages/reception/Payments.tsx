@@ -81,7 +81,7 @@ export default function Payments() {
     const patientName = paying.visits?.patients?.full_name || "patient";
     const token = paying.visits?.token_number || "";
     const seq: string[] = freshVisit?.service_sequence || [];
-    const toRoles: Department[] = (seq as Department[]).filter((s) => ["laboratory", "treatment", "pharmacy"].includes(s === "lab" ? "laboratory" : s) ).map((s: any) => s === "lab" ? "laboratory" : s);
+    const toRoles: Department[] = (seq as string[]).map((s) => s === "lab" ? "laboratory" : s as Department).filter((r) => ["laboratory", "treatment", "pharmacy"].includes(r));
 
     await logActivity({
       patient_id: paying.patient_id, visit_id: paying.visit_id,

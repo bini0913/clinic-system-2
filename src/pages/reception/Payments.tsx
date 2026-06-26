@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { fmtETB, fmtDateTime, audit, advance } from "@/lib/helpers";
+import { logActivity, notify, type Department } from "@/lib/activity";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { Printer, CheckCircle2 } from "lucide-react";

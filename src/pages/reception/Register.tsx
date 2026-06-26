@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { audit, genCardNumber, nextTokenLabel, fmtETB, fmtDate } from "@/lib/helpers";
+import { logActivity } from "@/lib/activity";
 import { toast } from "sonner";
 import { ArrowRight, Search, UserPlus, CreditCard, History } from "lucide-react";
 

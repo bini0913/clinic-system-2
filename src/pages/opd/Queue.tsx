@@ -13,7 +13,7 @@ export default function OPDQueue() {
   const [rows, setRows] = useState<any[]>([]);
   const load = async () => {
     const { data } = await supabase.from("visits")
-      .select("id,token_number,status,created_at,patients(full_name,phone,dob,gender),patient_cards(card_number)")
+      .select("id,token_number,status,created_at,patient_id,patients(full_name,phone,dob,gender),patient_cards(card_number)")
       .eq("status", "opd_waiting")
       .order("created_at");
     setRows(data ?? []);
@@ -35,7 +35,7 @@ export default function OPDQueue() {
               <TableRow key={v.id}>
                 <TableCell className="font-mono">{v.token_number}</TableCell>
                 <TableCell>
-                  <div className="font-medium">{v.patients?.full_name}</div>
+                  <Link to={`/patient/${v.patient_id}`} className="font-medium text-sky-600 hover:underline">{v.patients?.full_name}</Link>
                   <div className="text-xs text-muted-foreground">{v.patients?.phone}</div>
                 </TableCell>
                 <TableCell className="font-mono text-xs">{v.patient_cards?.card_number}</TableCell>

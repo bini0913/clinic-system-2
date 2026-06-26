@@ -129,7 +129,7 @@ export default function Payments() {
               return (
                 <TableRow key={p.id}>
                   <TableCell className="font-mono">{p.visits?.token_number}</TableCell>
-                  <TableCell>{p.visits?.patients?.full_name}</TableCell>
+                  <TableCell><a href={`/patient/${p.patient_id}`} className="text-sky-600 hover:underline font-medium">{p.visits?.patients?.full_name}</a></TableCell>
                   <TableCell className="text-xs">
                     {items.map((it, i) => (
                       <div key={i}>{it.service_name || it.name} <span className="text-muted-foreground">({it.type})</span> · {fmtETB(it.fee)}</div>

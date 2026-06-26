@@ -33,7 +33,7 @@ export default function ReceptionDashboard() {
     });
     const { data: rec } = await supabase
       .from("visits")
-      .select("id,token_number,status,created_at,patients(full_name,phone)")
+      .select("id,token_number,status,created_at,patient_id,patients(full_name,phone)")
       .order("created_at", { ascending: false }).limit(10);
     setRecent(rec ?? []);
   };
@@ -61,7 +61,7 @@ export default function ReceptionDashboard() {
               {recent.map((v) => (
                 <TableRow key={v.id}>
                   <TableCell className="font-mono">{v.token_number}</TableCell>
-                  <TableCell>{v.patients?.full_name}</TableCell>
+                  <TableCell><Link to={`/patient/${v.patient_id}`} className="text-sky-600 hover:underline font-medium">{v.patients?.full_name}</Link></TableCell>
                   <TableCell>{v.patients?.phone}</TableCell>
                   <TableCell><Badge variant="secondary">{v.status}</Badge></TableCell>
                   <TableCell className="text-muted-foreground">{new Date(v.created_at).toLocaleTimeString()}</TableCell>

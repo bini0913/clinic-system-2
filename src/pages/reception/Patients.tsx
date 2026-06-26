@@ -37,7 +37,7 @@ export default function Patients() {
           <TableBody>
             {rows.map((p) => (
               <TableRow key={p.id}>
-                <TableCell className="font-medium">{p.full_name}</TableCell>
+                <TableCell className="font-medium"><a href={`/patient/${p.id}`} className="text-sky-600 hover:underline">{p.full_name}</a></TableCell>
                 <TableCell>{p.phone}</TableCell>
                 <TableCell>{p.dob ? fmtDate(p.dob) : "-"}</TableCell>
                 <TableCell>{p.gender ?? "-"}</TableCell>

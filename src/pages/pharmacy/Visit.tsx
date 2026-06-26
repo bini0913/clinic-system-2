@@ -12,6 +12,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { audit, advance, fmtDateTime } from "@/lib/helpers";
+import { logActivity } from "@/lib/activity";
 import { toast } from "sonner";
 import { CheckCircle2, Printer, AlertTriangle } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
@@ -39,8 +40,10 @@ export default function PharmacyVisit() {
     load();
   };
 
-  const toggleDispensed = (r: any, val: boolean) =>
-    updateRow(r, { status: val ? "dispensed" : "pending", dispensed_at: val ? new Date().toISOString() : null, dispensed_by: val ? user?.id ?? null : null });
+  const toggleDispensed = async (r: any, val: boolean) => {
+    await updateRow(r, { status: val ? "dispensed" : "pending", dispensed_at: val ? new Date().toISOString() : null, dispensed_by: val ? user?.id ?? null : null });
+    if (val) await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "pharmacy", action: `Dispensed — ${r.medicine_name}`, details: { qty: r.quantity, batch: r.batch_number } });
+  };
 
   const toggleOOS = (r: any) =>
     updateRow(r, { out_of_stock: !r.out_of_stock, status: !r.out_of_stock ? "out_of_stock" : "pending" });

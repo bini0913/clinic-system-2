@@ -116,12 +116,13 @@ export default function Layout() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden flex items-center justify-between p-3 border-b">
-          <Button variant="ghost" size="icon" onClick={() => setOpen(!open)}>
+        <header className="flex items-center justify-between p-3 border-b gap-3">
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)}>
             <Menu />
           </Button>
-          <div className="font-semibold truncate">{clinicName}</div>
-          <div className="w-9" />
+          <div className="font-semibold truncate md:hidden">{clinicName}</div>
+          <div className="flex-1 hidden md:block" />
+          <NotificationBell />
         </header>
         <main className="flex-1 p-4 md:p-6 overflow-x-auto">
           <Outlet />

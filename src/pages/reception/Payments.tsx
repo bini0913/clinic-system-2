@@ -71,12 +71,29 @@ export default function Payments() {
 
     // Advance visit to first service in sequence (or complete)
     const { data: freshVisit } = await supabase.from("visits")
-      .select("id,service_sequence,current_step_index")
+      .select("id,patient_id,service_sequence,current_step_index")
       .eq("id", paying.visits?.id ?? paying.visit_id)
       .single();
     if (freshVisit) {
-      // Reset to -1 so advance() moves to index 0 (first service)
       await advance({ ...freshVisit, current_step_index: -1 });
+    }
+
+    const patientName = paying.visits?.patients?.full_name || "patient";
+    const token = paying.visits?.token_number || "";
+    const seq: string[] = freshVisit?.service_sequence || [];
+    const toRoles: Department[] = (seq as Department[]).filter((s) => ["laboratory", "treatment", "pharmacy"].includes(s === "lab" ? "laboratory" : s) ).map((s: any) => s === "lab" ? "laboratory" : s);
+
+    await logActivity({
+      patient_id: paying.patient_id, visit_id: paying.visit_id,
+      department: "reception", action: `Payment collected — ${paying.total_amount} ETB (${method})`,
+      details: { amount: paying.total_amount, method },
+    });
+    if (toRoles.length > 0) {
+      await notify({
+        to_role: toRoles, from_role: "reception",
+        visit_id: paying.visit_id, patient_id: paying.patient_id,
+        message: `Patient ${patientName} payment cleared — Token ${token}`,
+      });
     }
 
     await audit("PAYMENT_COLLECTED", "payments", paying.id, { amount: paying.total_amount, method });

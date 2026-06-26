@@ -6,27 +6,35 @@ import Login from "@/pages/Login";
 import Display from "@/pages/Display";
 import Landing from "@/pages/Landing";
 import Layout from "@/components/Layout";
+import PatientProfile from "@/pages/shared/PatientProfile";
 import ReceptionDashboard from "@/pages/reception/Dashboard";
 import ReceptionPatients from "@/pages/reception/Patients";
 import ReceptionRegister from "@/pages/reception/Register";
 import ReceptionAppointments from "@/pages/reception/Appointments";
 import ReceptionQueue from "@/pages/reception/Queue";
 import ReceptionPayments from "@/pages/reception/Payments";
+import ReceptionActivity from "@/pages/reception/Activity";
 import OPDDashboard from "@/pages/opd/Dashboard";
 import OPDQueue from "@/pages/opd/Queue";
 import OPDVisit from "@/pages/opd/Visit";
+import OPDActivity from "@/pages/opd/Activity";
 import LabDashboard from "@/pages/lab/Dashboard";
 import LabVisit from "@/pages/lab/Visit";
+import LabActivity from "@/pages/lab/Activity";
 import TreatmentDashboard from "@/pages/treatment/Dashboard";
 import TreatmentVisit from "@/pages/treatment/Visit";
+import TreatmentActivity from "@/pages/treatment/Activity";
 import PharmacyDashboard from "@/pages/pharmacy/Dashboard";
 import PharmacyVisit from "@/pages/pharmacy/Visit";
+import PharmacyActivity from "@/pages/pharmacy/Activity";
 import AdminDashboard from "@/pages/admin/Dashboard";
 import AdminUsers from "@/pages/admin/Users";
 import AdminServices from "@/pages/admin/Services";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminAudit from "@/pages/admin/Audit";
 import AdminReports from "@/pages/admin/Reports";
+
+const ALL_ROLES: Role[] = ["admin", "reception", "opd", "laboratory", "treatment", "pharmacy"];
 
 function Protected({ roles, children }: { roles: Role[]; children: React.ReactElement }) {
   const { user, loading } = useAuth();
@@ -41,12 +49,8 @@ function HomeRedirect() {
   if (loading) return <div className="p-8">Loading…</div>;
   if (!user) return <Navigate to="/login" replace />;
   const map: Record<Role, string> = {
-    admin: "/admin",
-    reception: "/reception",
-    opd: "/opd",
-    laboratory: "/lab",
-    treatment: "/treatment",
-    pharmacy: "/pharmacy",
+    admin: "/admin", reception: "/reception", opd: "/opd",
+    laboratory: "/lab", treatment: "/treatment", pharmacy: "/pharmacy",
   };
   return <Navigate to={map[user.role]} replace />;
 }
@@ -56,12 +60,8 @@ function RootRedirect() {
   if (loading) return <div className="min-h-screen bg-[#070C18]" />;
   if (user) {
     const map: Record<Role, string> = {
-      admin: "/admin",
-      reception: "/reception",
-      opd: "/opd",
-      laboratory: "/lab",
-      treatment: "/treatment",
-      pharmacy: "/pharmacy",
+      admin: "/admin", reception: "/reception", opd: "/opd",
+      laboratory: "/lab", treatment: "/treatment", pharmacy: "/pharmacy",
     };
     return <Navigate to={map[user.role]} replace />;
   }
@@ -74,6 +74,10 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/display" element={<Display />} />
 
+      <Route element={<Protected roles={ALL_ROLES}><Layout /></Protected>}>
+        <Route path="/patient/:patientId" element={<PatientProfile />} />
+      </Route>
+
       <Route element={<Protected roles={["reception"]}><Layout /></Protected>}>
         <Route path="/reception" element={<ReceptionDashboard />} />
         <Route path="/reception/register" element={<ReceptionRegister />} />
@@ -81,27 +85,32 @@ export default function App() {
         <Route path="/reception/appointments" element={<ReceptionAppointments />} />
         <Route path="/reception/queue" element={<ReceptionQueue />} />
         <Route path="/reception/payments" element={<ReceptionPayments />} />
+        <Route path="/reception/activity" element={<ReceptionActivity />} />
       </Route>
 
       <Route element={<Protected roles={["opd"]}><Layout /></Protected>}>
         <Route path="/opd" element={<OPDDashboard />} />
         <Route path="/opd/queue" element={<OPDQueue />} />
         <Route path="/opd/visit/:id" element={<OPDVisit />} />
+        <Route path="/opd/activity" element={<OPDActivity />} />
       </Route>
 
       <Route element={<Protected roles={["laboratory"]}><Layout /></Protected>}>
         <Route path="/lab" element={<LabDashboard />} />
         <Route path="/lab/visit/:id" element={<LabVisit />} />
+        <Route path="/lab/activity" element={<LabActivity />} />
       </Route>
 
       <Route element={<Protected roles={["treatment"]}><Layout /></Protected>}>
         <Route path="/treatment" element={<TreatmentDashboard />} />
         <Route path="/treatment/visit/:id" element={<TreatmentVisit />} />
+        <Route path="/treatment/activity" element={<TreatmentActivity />} />
       </Route>
 
       <Route element={<Protected roles={["pharmacy"]}><Layout /></Protected>}>
         <Route path="/pharmacy" element={<PharmacyDashboard />} />
         <Route path="/pharmacy/visit/:id" element={<PharmacyVisit />} />
+        <Route path="/pharmacy/activity" element={<PharmacyActivity />} />
       </Route>
 
       <Route element={<Protected roles={["admin"]}><Layout /></Protected>}>

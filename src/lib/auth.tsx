@@ -44,6 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     setUser(u);
     localStorage.setItem("clinic_user", JSON.stringify(u));
+    await supabase.from("users").update({ last_active: new Date().toISOString() }).eq("id", u.id);
     await supabase.from("audit_logs").insert({
       user_id: u.id, action: "LOGIN", entity_type: "auth", entity_id: u.id, details: { role: u.role, email: u.email },
     });

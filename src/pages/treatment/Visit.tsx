@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { audit, advance, fmtDateTime } from "@/lib/helpers";
+import { logActivity } from "@/lib/activity";
 import { toast } from "sonner";
 import { ArrowRight, Plus, Trash2 } from "lucide-react";
 
@@ -49,6 +50,7 @@ export default function TreatmentVisit() {
       findings: n.findings || null, patient_response: n.patient_response || null,
       complications: n.complications || null, notes: n.notes || null,
     });
+    await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "treatment", action: `Treatment record saved — ${n.procedure}`, details: { procedure: n.procedure, route: n.route } });
     setN({ procedure: "", route: "IV", medication_used: "", dose: "", dose_unit: "mg", start_time: "", end_time: "", findings: "", patient_response: "", complications: "", notes: "" });
     load();
     toast.success("Saved");

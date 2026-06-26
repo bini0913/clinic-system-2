@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Users, ListOrdered, CreditCard, Stethoscope, FlaskConical,
   Activity, Pill, Settings, FileText, ShieldCheck, BarChart3, LogOut, Menu, Tv,
-  UserPlus, CalendarDays,
+  UserPlus, CalendarDays, ClipboardList,
 } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,19 +20,24 @@ const NAV: Record<Role, { to: string; label: string; icon: any }[]> = {
     { to: "/reception/appointments", label: "Appointments", icon: CalendarDays },
     { to: "/reception/queue", label: "Live Queue", icon: ListOrdered },
     { to: "/reception/payments", label: "Payments", icon: CreditCard },
+    { to: "/reception/activity", label: "Activity Log", icon: ClipboardList },
   ],
   opd: [
     { to: "/opd", label: "Dashboard", icon: LayoutDashboard },
     { to: "/opd/queue", label: "Patient Queue", icon: Stethoscope },
+    { to: "/opd/activity", label: "Activity Log", icon: ClipboardList },
   ],
   laboratory: [
     { to: "/lab", label: "Lab Queue", icon: FlaskConical },
+    { to: "/lab/activity", label: "Activity Log", icon: ClipboardList },
   ],
   treatment: [
     { to: "/treatment", label: "Treatment Queue", icon: Activity },
+    { to: "/treatment/activity", label: "Activity Log", icon: ClipboardList },
   ],
   pharmacy: [
     { to: "/pharmacy", label: "Pharmacy Queue", icon: Pill },
+    { to: "/pharmacy/activity", label: "Activity Log", icon: ClipboardList },
   ],
   admin: [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -110,12 +116,13 @@ export default function Layout() {
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="md:hidden flex items-center justify-between p-3 border-b">
-          <Button variant="ghost" size="icon" onClick={() => setOpen(!open)}>
+        <header className="flex items-center justify-between p-3 border-b gap-3">
+          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setOpen(!open)}>
             <Menu />
           </Button>
-          <div className="font-semibold truncate">{clinicName}</div>
-          <div className="w-9" />
+          <div className="font-semibold truncate md:hidden">{clinicName}</div>
+          <div className="flex-1 hidden md:block" />
+          <NotificationBell />
         </header>
         <main className="flex-1 p-4 md:p-6 overflow-x-auto">
           <Outlet />

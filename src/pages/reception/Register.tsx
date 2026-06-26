@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { audit, genCardNumber, nextTokenLabel, fmtETB, fmtDate } from "@/lib/helpers";
+import { logActivity } from "@/lib/activity";
 import { toast } from "sonner";
 import { ArrowRight, Search, UserPlus, CreditCard, History } from "lucide-react";
 
@@ -112,9 +113,11 @@ export default function ReceptionRegister() {
         if (error) throw error;
         patientId = data.id;
         await audit("PATIENT_CREATED", "patients", patientId!, { phone: form.phone, name: form.full_name });
+        await logActivity({ patient_id: patientId!, department: "reception", action: "Patient registered", details: { name: form.full_name, phone: form.phone } });
       } else {
         await supabase.from("patients").update(payload).eq("id", patientId);
         await audit("PATIENT_UPDATED", "patients", patientId);
+        await logActivity({ patient_id: patientId, department: "reception", action: "Patient details updated" });
       }
 
       const { data: card, error: cardErr } = await supabase.from("patient_cards")
@@ -131,6 +134,8 @@ export default function ReceptionRegister() {
       }).select().single();
       if (vErr) throw vErr;
 
+      await logActivity({ patient_id: patientId!, visit_id: visit.id, department: "reception", action: `New visit started — ${token}`, details: { card: cardNumber } });
+
       const { error: payErr } = await supabase.from("payments").insert({
         visit_id: visit.id, patient_id: patientId, payment_type: "card_fee",
         services_breakdown: [{ name: "Patient Card", fee: cardFee }],
@@ -140,6 +145,8 @@ export default function ReceptionRegister() {
         status: "paid", received_by: u?.id ?? null, paid_at: new Date().toISOString(),
       });
       if (payErr) throw payErr;
+
+      await logActivity({ patient_id: patientId!, visit_id: visit.id, department: "reception", action: `Card fee collected — ${cardFee} ETB (${method})` });
 
       await audit("REGISTRATION", "visits", visit.id, { token, card: cardNumber, fee: cardFee });
       toast.success(`Registered – ${token} · ${cardNumber}`);

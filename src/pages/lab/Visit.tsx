@@ -53,6 +53,7 @@ export default function LabVisit() {
       test_name: svcName, result: d.result, unit: d.unit || null,
       reference_range: d.reference_range || null, status: d.status || "Normal", notes: d.notes || null,
     });
+    await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "laboratory", action: `Lab result entered — ${svcName}`, details: { result: d.result, status: d.status } });
     setDrafts({ ...drafts, [svcName]: { result: "", unit: "", reference_range: "", status: "Normal", notes: "" } });
     load();
   };
@@ -60,6 +61,7 @@ export default function LabVisit() {
   const addExtra = async () => {
     if (!extra.test_name || !extra.result) { toast.error("Test and result required"); return; }
     await supabase.from("lab_results").insert({ ...extra, visit_id: id, patient_id: visit.patient_id });
+    await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "laboratory", action: `Lab result entered — ${extra.test_name}`, details: { result: extra.result, status: extra.status } });
     setExtra({ test_name: "", result: "", unit: "", reference_range: "", status: "Normal", notes: "" });
     load();
   };
@@ -70,8 +72,14 @@ export default function LabVisit() {
 
   const finish = async () => {
     await supabase.from("lab_results").update({ results_ready: true }).eq("visit_id", id);
-    await advance(visit);
+    await advance({ ...visit });
     await audit("LAB_DONE", "visits", id as string);
+    await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "laboratory", action: "Lab results submitted to OPD" });
+    await notify({
+      to_role: "opd", from_role: "laboratory",
+      visit_id: id as string, patient_id: visit.patient_id,
+      message: `Lab results ready for ${visit.patients?.full_name} — Token ${visit.token_number}`,
+    });
     toast.success("Lab completed — OPD notified");
     nav("/lab");
   };

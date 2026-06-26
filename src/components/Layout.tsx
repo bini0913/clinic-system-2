@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Users, ListOrdered, CreditCard, Stethoscope, FlaskConical,
   Activity, Pill, Settings, FileText, ShieldCheck, BarChart3, LogOut, Menu, Tv,
-  UserPlus, CalendarDays,
+  UserPlus, CalendarDays, ClipboardList,
 } from "lucide-react";
+import NotificationBell from "@/components/NotificationBell";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -19,19 +20,24 @@ const NAV: Record<Role, { to: string; label: string; icon: any }[]> = {
     { to: "/reception/appointments", label: "Appointments", icon: CalendarDays },
     { to: "/reception/queue", label: "Live Queue", icon: ListOrdered },
     { to: "/reception/payments", label: "Payments", icon: CreditCard },
+    { to: "/reception/activity", label: "Activity Log", icon: ClipboardList },
   ],
   opd: [
     { to: "/opd", label: "Dashboard", icon: LayoutDashboard },
     { to: "/opd/queue", label: "Patient Queue", icon: Stethoscope },
+    { to: "/opd/activity", label: "Activity Log", icon: ClipboardList },
   ],
   laboratory: [
     { to: "/lab", label: "Lab Queue", icon: FlaskConical },
+    { to: "/lab/activity", label: "Activity Log", icon: ClipboardList },
   ],
   treatment: [
     { to: "/treatment", label: "Treatment Queue", icon: Activity },
+    { to: "/treatment/activity", label: "Activity Log", icon: ClipboardList },
   ],
   pharmacy: [
     { to: "/pharmacy", label: "Pharmacy Queue", icon: Pill },
+    { to: "/pharmacy/activity", label: "Activity Log", icon: ClipboardList },
   ],
   admin: [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },

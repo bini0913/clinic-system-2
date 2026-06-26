@@ -14,7 +14,7 @@ export default function ServiceQueue({
   const [rows, setRows] = useState<any[]>([]);
   const load = async () => {
     const { data } = await supabase.from("visits")
-      .select("id,token_number,status,created_at,patients(full_name,phone),patient_cards(card_number)")
+      .select("id,token_number,status,created_at,patient_id,patients(full_name,phone),patient_cards(card_number)")
       .eq("status", waitingStatus)
       .order("created_at");
     setRows(data ?? []);
@@ -33,7 +33,7 @@ export default function ServiceQueue({
           {rows.map((v) => (
             <TableRow key={v.id}>
               <TableCell className="font-mono">{v.token_number}</TableCell>
-              <TableCell><div className="font-medium">{v.patients?.full_name}</div><div className="text-xs text-muted-foreground">{v.patients?.phone}</div></TableCell>
+              <TableCell><div><Link to={`/patient/${v.patient_id}`} className="font-medium text-sky-600 hover:underline">{v.patients?.full_name}</Link></div><div className="text-xs text-muted-foreground">{v.patients?.phone}</div></TableCell>
               <TableCell className="font-mono text-xs">{v.patient_cards?.card_number}</TableCell>
               <TableCell><Badge variant="secondary">{v.status}</Badge></TableCell>
               <TableCell className="text-xs text-muted-foreground">{fmtDateTime(v.created_at)}</TableCell>

@@ -59,5 +59,12 @@ export async function advance(visit: any) {
       status: "completed",
       completed_at: new Date().toISOString(),
     }).eq("id", visit.id);
+    if (visit.patient_id) {
+      const { logActivity } = await import("./activity");
+      await logActivity({
+        patient_id: visit.patient_id, visit_id: visit.id,
+        department: "reception", action: "Visit completed",
+      });
+    }
   }
 }

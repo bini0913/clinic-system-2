@@ -71,3 +71,14 @@ create policy "appointments_all" on public.appointments for all using (true) wit
 
 create index if not exists appointments_scheduled_at_idx on public.appointments(scheduled_at);
 create index if not exists appointments_patient_idx on public.appointments(patient_id);
+
+-- ===== Post-lab OPD review (added for Lab Result Review feature) =====
+ALTER TABLE public.opd_records
+  ADD COLUMN IF NOT EXISTS post_lab_review_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS post_lab_review_diagnosis TEXT,
+  ADD COLUMN IF NOT EXISTS post_lab_review_notes TEXT;
+
+-- New visit status value used by the OPD lab-review queue: 'lab_result_pending'
+-- (no schema change needed if visits.status is TEXT; if it's an enum, run:
+--   ALTER TYPE visit_status ADD VALUE IF NOT EXISTS 'lab_result_pending';
+-- )

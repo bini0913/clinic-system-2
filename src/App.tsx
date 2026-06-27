@@ -18,6 +18,7 @@ import OPDDashboard from "@/pages/opd/Dashboard";
 import OPDQueue from "@/pages/opd/Queue";
 import OPDVisit from "@/pages/opd/Visit";
 import OPDActivity from "@/pages/opd/Activity";
+import OPDLabResultQueue from "@/pages/opd/LabResultQueue";
 import LabDashboard from "@/pages/lab/Dashboard";
 import LabVisit from "@/pages/lab/Visit";
 import LabActivity from "@/pages/lab/Activity";
@@ -91,6 +92,7 @@ export default function App() {
       <Route element={<Protected roles={["opd"]}><Layout /></Protected>}>
         <Route path="/opd" element={<OPDDashboard />} />
         <Route path="/opd/queue" element={<OPDQueue />} />
+        <Route path="/opd/lab-results" element={<OPDLabResultQueue />} />
         <Route path="/opd/visit/:id" element={<OPDVisit />} />
         <Route path="/opd/activity" element={<OPDActivity />} />
       </Route>

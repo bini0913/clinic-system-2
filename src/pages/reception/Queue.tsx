@@ -6,15 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { fmtDateTime } from "@/lib/helpers";
-
-const STATUS_TONE: Record<string, string> = {
-  opd_waiting: "bg-sky-100 text-sky-700",
-  pending_payment: "bg-rose-100 text-rose-700",
-  lab_waiting: "bg-amber-100 text-amber-700",
-  treatment_waiting: "bg-violet-100 text-violet-700",
-  pharmacy_waiting: "bg-emerald-100 text-emerald-700",
-  completed: "bg-slate-200 text-slate-700",
-};
+import { statusLabel, statusColor } from "@/lib/visitStatus";
 
 export default function Queue() {
   const [rows, setRows] = useState<any[]>([]);
@@ -44,7 +36,7 @@ export default function Queue() {
                 <TableCell className="font-mono font-medium">{v.token_number}</TableCell>
                 <TableCell><a href={`/patient/${v.patient_id}`} className="text-sky-600 hover:underline font-medium">{v.patients?.full_name}</a></TableCell>
                 <TableCell>{v.patients?.phone}</TableCell>
-                <TableCell><Badge className={STATUS_TONE[v.status] ?? ""} variant="secondary">{v.status}</Badge></TableCell>
+                <TableCell><Badge className={statusColor(v.status)} variant="outline">{statusLabel(v.status)}</Badge></TableCell>
                 <TableCell className="text-muted-foreground text-xs">{fmtDateTime(v.created_at)}</TableCell>
               </TableRow>
             ))}

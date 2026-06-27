@@ -2,17 +2,20 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useSettings } from "@/lib/settings";
 import type { Role } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
+import { useRealtime } from "@/lib/useRealtime";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard, Users, ListOrdered, CreditCard, Stethoscope, FlaskConical,
   Activity, Pill, Settings, FileText, ShieldCheck, BarChart3, LogOut, Menu, Tv,
-  UserPlus, CalendarDays, ClipboardList,
+  UserPlus, CalendarDays, ClipboardList, FlaskRound,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-const NAV: Record<Role, { to: string; label: string; icon: any }[]> = {
+const NAV: Record<Role, { to: string; label: string; icon: any; badge?: string }[]> = {
   reception: [
     { to: "/reception", label: "Dashboard", icon: LayoutDashboard },
     { to: "/reception/register", label: "Register Patient", icon: UserPlus },
@@ -25,6 +28,7 @@ const NAV: Record<Role, { to: string; label: string; icon: any }[]> = {
   opd: [
     { to: "/opd", label: "Dashboard", icon: LayoutDashboard },
     { to: "/opd/queue", label: "Patient Queue", icon: Stethoscope },
+    { to: "/opd/lab-results", label: "Lab Results", icon: FlaskRound, badge: "lab_result_pending" as const },
     { to: "/opd/activity", label: "Activity Log", icon: ClipboardList },
   ],
   laboratory: [
@@ -54,6 +58,20 @@ export default function Layout() {
   const { settings } = useSettings();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
+  const [badges, setBadges] = useState<Record<string, number>>({});
+
+  const loadBadges = async () => {
+    const next: Record<string, number> = {};
+    const statuses = Array.from(new Set((user ? NAV[user.role] : []).map((i) => i.badge).filter(Boolean))) as string[];
+    for (const st of statuses) {
+      const { count } = await supabase.from("visits").select("id", { count: "exact", head: true }).eq("status", st);
+      next[st] = count ?? 0;
+    }
+    setBadges(next);
+  };
+  useEffect(() => { if (user) loadBadges(); /* eslint-disable-next-line */ }, [user?.role]);
+  useRealtime(["visits"], () => { if (user) loadBadges(); });
+
   if (!user) return null;
   const items = NAV[user.role];
   const clinicName = settings.clinic_name || "Clinic MS";
@@ -87,7 +105,10 @@ export default function Layout() {
               }
             >
               <it.icon className="h-4 w-4" />
-              {it.label}
+              <span className="flex-1">{it.label}</span>
+              {it.badge && (badges[it.badge] ?? 0) > 0 && (
+                <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-[10px]">{badges[it.badge]}</Badge>
+              )}
             </NavLink>
           ))}
         </nav>

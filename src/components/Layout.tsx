@@ -2,14 +2,17 @@ import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { useSettings } from "@/lib/settings";
 import type { Role } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
+import { useRealtime } from "@/lib/useRealtime";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard, Users, ListOrdered, CreditCard, Stethoscope, FlaskConical,
   Activity, Pill, Settings, FileText, ShieldCheck, BarChart3, LogOut, Menu, Tv,
-  UserPlus, CalendarDays, ClipboardList,
+  UserPlus, CalendarDays, ClipboardList, FlaskRound,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV: Record<Role, { to: string; label: string; icon: any }[]> = {
@@ -25,6 +28,7 @@ const NAV: Record<Role, { to: string; label: string; icon: any }[]> = {
   opd: [
     { to: "/opd", label: "Dashboard", icon: LayoutDashboard },
     { to: "/opd/queue", label: "Patient Queue", icon: Stethoscope },
+    { to: "/opd/lab-results", label: "Lab Results", icon: FlaskRound, badge: "lab_result_pending" as const },
     { to: "/opd/activity", label: "Activity Log", icon: ClipboardList },
   ],
   laboratory: [

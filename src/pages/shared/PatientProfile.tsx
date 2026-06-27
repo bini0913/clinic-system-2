@@ -333,7 +333,7 @@ export default function PatientProfile() {
                 <summary className="cursor-pointer p-4 flex flex-wrap gap-3 items-center">
                   <span className="font-mono font-semibold">{v.token_number}</span>
                   <span className="text-sm">{fmtDateTime(v.created_at)}</span>
-                  <Badge variant={v.status === "completed" ? "default" : "secondary"}>{v.status}</Badge>
+                  <Badge className={statusColor(v.status)} variant="outline">{statusLabel(v.status)}</Badge>
                   {o?.diagnosis && <span className="text-sm truncate max-w-md">Dx: {o.diagnosis}</span>}
                 </summary>
                 <div className="p-4 pt-0 space-y-4 text-sm">

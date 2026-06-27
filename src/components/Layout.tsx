@@ -58,6 +58,20 @@ export default function Layout() {
   const { settings } = useSettings();
   const nav = useNavigate();
   const [open, setOpen] = useState(false);
+  const [badges, setBadges] = useState<Record<string, number>>({});
+
+  const loadBadges = async () => {
+    const next: Record<string, number> = {};
+    const statuses = Array.from(new Set((user ? NAV[user.role] : []).map((i) => i.badge).filter(Boolean))) as string[];
+    for (const st of statuses) {
+      const { count } = await supabase.from("visits").select("id", { count: "exact", head: true }).eq("status", st);
+      next[st] = count ?? 0;
+    }
+    setBadges(next);
+  };
+  useEffect(() => { if (user) loadBadges(); /* eslint-disable-next-line */ }, [user?.role]);
+  useRealtime(["visits"], () => { if (user) loadBadges(); });
+
   if (!user) return null;
   const items = NAV[user.role];
   const clinicName = settings.clinic_name || "Clinic MS";
@@ -91,7 +105,10 @@ export default function Layout() {
               }
             >
               <it.icon className="h-4 w-4" />
-              {it.label}
+              <span className="flex-1">{it.label}</span>
+              {it.badge && (badges[it.badge] ?? 0) > 0 && (
+                <Badge variant="destructive" className="h-5 min-w-5 px-1.5 text-[10px]">{badges[it.badge]}</Badge>
+              )}
             </NavLink>
           ))}
         </nav>

@@ -15,7 +15,7 @@ import NotificationBell from "@/components/NotificationBell";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
-const NAV: Record<Role, { to: string; label: string; icon: any }[]> = {
+const NAV: Record<Role, { to: string; label: string; icon: any; badge?: string }[]> = {
   reception: [
     { to: "/reception", label: "Dashboard", icon: LayoutDashboard },
     { to: "/reception/register", label: "Register Patient", icon: UserPlus },

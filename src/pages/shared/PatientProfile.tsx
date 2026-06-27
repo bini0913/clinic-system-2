@@ -314,6 +314,8 @@ export default function PatientProfile() {
         </CardContent>
       </Card>
 
+      {currentVisit && <CurrentVisit visit={currentVisit} cards={cards} />}
+
       <Tabs defaultValue="timeline">
         <TabsList>
           <TabsTrigger value="timeline">Visit Timeline ({visits.length})</TabsTrigger>

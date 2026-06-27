@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { fmtDateTime } from "@/lib/helpers";
+import { statusLabel, statusColor } from "@/lib/visitStatus";
 
 export default function ServiceQueue({
   waitingStatus, basePath,
@@ -35,7 +36,7 @@ export default function ServiceQueue({
               <TableCell className="font-mono">{v.token_number}</TableCell>
               <TableCell><div><Link to={`/patient/${v.patient_id}`} className="font-medium text-sky-600 hover:underline">{v.patients?.full_name}</Link></div><div className="text-xs text-muted-foreground">{v.patients?.phone}</div></TableCell>
               <TableCell className="font-mono text-xs">{v.patient_cards?.card_number}</TableCell>
-              <TableCell><Badge variant="secondary">{v.status}</Badge></TableCell>
+              <TableCell><Badge className={statusColor(v.status)} variant="outline">{statusLabel(v.status)}</Badge></TableCell>
               <TableCell className="text-xs text-muted-foreground">{fmtDateTime(v.created_at)}</TableCell>
               <TableCell className="text-right">
                 <Button size="sm" asChild><Link to={`${basePath}/visit/${v.id}`}>Open</Link></Button>

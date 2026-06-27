@@ -36,7 +36,7 @@ export default function Queue() {
                 <TableCell className="font-mono font-medium">{v.token_number}</TableCell>
                 <TableCell><a href={`/patient/${v.patient_id}`} className="text-sky-600 hover:underline font-medium">{v.patients?.full_name}</a></TableCell>
                 <TableCell>{v.patients?.phone}</TableCell>
-                <TableCell><Badge className={STATUS_TONE[v.status] ?? ""} variant="secondary">{v.status}</Badge></TableCell>
+                <TableCell><Badge className={statusColor(v.status)} variant="outline">{statusLabel(v.status)}</Badge></TableCell>
                 <TableCell className="text-muted-foreground text-xs">{fmtDateTime(v.created_at)}</TableCell>
               </TableRow>
             ))}

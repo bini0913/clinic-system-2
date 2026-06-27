@@ -72,15 +72,16 @@ export default function LabVisit() {
 
   const finish = async () => {
     await supabase.from("lab_results").update({ results_ready: true }).eq("visit_id", id);
-    await advance({ ...visit });
+    // Do NOT advance — the patient must return to OPD for review first.
+    await supabase.from("visits").update({ status: "lab_result_pending" }).eq("id", id);
     await audit("LAB_DONE", "visits", id as string);
-    await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "laboratory", action: "Lab results submitted to OPD" });
+    await logActivity({ patient_id: visit.patient_id, visit_id: id as string, department: "laboratory", action: "Lab results submitted — awaiting OPD review" });
     await notify({
       to_role: "opd", from_role: "laboratory",
       visit_id: id as string, patient_id: visit.patient_id,
-      message: `Lab results ready for ${visit.patients?.full_name} — Token ${visit.token_number}`,
+      message: `Lab results ready for ${visit.patients?.full_name} — Token ${visit.token_number}. Please review and decide next steps.`,
     });
-    toast.success("Lab completed — OPD notified");
+    toast.success("Submitted — OPD will review results");
     nav("/lab");
   };
 

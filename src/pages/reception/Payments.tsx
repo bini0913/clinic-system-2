@@ -182,12 +182,20 @@ export default function Payments() {
                     <SelectTrigger><SelectValue placeholder="Select bank…" /></SelectTrigger>
                     <SelectContent>
                       {banks.length === 0 && <SelectItem value="Other">Other</SelectItem>}
-                      {banks.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                      {banks.map((b) => (
+                        <SelectItem key={b.name} value={b.name}>
+                          {b.name}{b.account ? ` — Account: ${b.account}` : ""}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  {selectedBank?.account && (
+                    <div className="text-xs text-muted-foreground">Account: {selectedBank.account}</div>
+                  )}
                 </div>
                 <div className="space-y-1"><Label>Reference</Label>
-                  <Input value={ref} onChange={(e) => setRef(e.target.value)} /></div>
+                  <Input value={ref} onChange={(e) => setRef(e.target.value)}
+                    placeholder={selectedBank?.account ? `Transfer ref to ${selectedBank.account}` : "Transaction reference"} /></div>
               </>
             )}
           </div>

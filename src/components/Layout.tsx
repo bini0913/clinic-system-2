@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard, Users, ListOrdered, CreditCard, Stethoscope, FlaskConical,
   Activity, Pill, Settings, FileText, ShieldCheck, BarChart3, LogOut, Menu, Tv,
-  UserPlus, CalendarDays, ClipboardList, FlaskRound,
+  UserPlus, CalendarDays, ClipboardList,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import { useEffect, useState } from "react";
@@ -28,7 +28,7 @@ const NAV: Record<Role, { to: string; label: string; icon: any; badge?: string }
   opd: [
     { to: "/opd", label: "Dashboard", icon: LayoutDashboard },
     { to: "/opd/queue", label: "Patient Queue", icon: Stethoscope },
-    { to: "/opd/lab-results", label: "Lab Results", icon: FlaskRound, badge: "lab_result_pending" as const },
+    { to: "/opd/lab-results", label: "Lab Results", icon: FlaskConical, badge: "lab_result_pending" as const },
     { to: "/opd/activity", label: "Activity Log", icon: ClipboardList },
   ],
   laboratory: [

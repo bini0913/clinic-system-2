@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   LayoutDashboard, Users, ListOrdered, CreditCard, Stethoscope, FlaskConical,
   Activity, Pill, Settings, FileText, ShieldCheck, BarChart3, LogOut, Menu, Tv,
-  UserPlus, CalendarDays, ClipboardList, FlaskRound,
+  UserPlus, CalendarDays, ClipboardList,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
 import { useEffect, useState } from "react";

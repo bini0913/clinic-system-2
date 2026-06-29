@@ -19,10 +19,19 @@ import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { Printer, CheckCircle2 } from "lucide-react";
 
+type Bank = { name: string; account: string };
+
+function normalizeBanks(raw: any): Bank[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((b: any) => typeof b === "string" ? { name: b, account: "" } : { name: b?.name ?? "", account: b?.account ?? "" })
+    .filter((b) => b.name);
+}
+
 export default function Payments() {
   const { user } = useAuth();
   const { settings } = useSettings();
-  const banks: string[] = (settings.banks as string[]) || [];
+  const banks: Bank[] = normalizeBanks(settings.banks);
 
   const [rows, setRows] = useState<any[]>([]);
   const [filter, setFilter] = useState("pending");
@@ -33,6 +42,8 @@ export default function Payments() {
   const [ref, setRef] = useState("");
   const ref0 = useRef<HTMLDivElement>(null);
   const print = useReactToPrint({ contentRef: ref0 });
+
+  const selectedBank = banks.find((b) => b.name === bank);
 
   const load = async () => {
     let q = supabase.from("payments")

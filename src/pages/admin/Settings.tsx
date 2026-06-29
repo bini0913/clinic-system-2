@@ -13,23 +13,32 @@ import { Trash2, Plus } from "lucide-react";
 
 const KNOWN = ["clinic_name", "address", "phone", "email", "card_fee", "receipt_footer"];
 
+type Bank = { name: string; account: string };
+
+function normalizeBanks(raw: any): Bank[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((b: any) => typeof b === "string" ? { name: b, account: "" } : { name: b?.name ?? "", account: b?.account ?? "" })
+    .filter((b) => b.name);
+}
+
 export default function Settings() {
   const { refresh } = useSettings();
   const [rows, setRows] = useState<Record<string, string>>({});
-  const [banks, setBanks] = useState<string[]>([]);
-  const [newBank, setNewBank] = useState("");
+  const [banks, setBanks] = useState<Bank[]>([]);
+  const [newBankName, setNewBankName] = useState("");
+  const [newBankAccount, setNewBankAccount] = useState("");
 
   const load = async () => {
     const { data } = await supabase.from("clinic_settings").select("*");
     const obj: Record<string, string> = {};
     (data ?? []).forEach((r: any) => { obj[r.key] = r.value ?? ""; });
     setRows(obj);
-    try { setBanks(JSON.parse(obj.banks || "[]")); } catch { setBanks([]); }
+    try { setBanks(normalizeBanks(JSON.parse(obj.banks || "[]"))); } catch { setBanks([]); }
   };
   useEffect(() => { load(); }, []);
 
   const upsertKey = async (key: string, value: string) => {
-    // Try update; if 0 rows affected, insert
     const { data } = await supabase.from("clinic_settings").update({ value }).eq("key", key).select();
     if (!data || data.length === 0) {
       await supabase.from("clinic_settings").insert({ key, value });
@@ -45,6 +54,14 @@ export default function Settings() {
   };
 
   const set = (k: string, v: string) => setRows((p) => ({ ...p, [k]: v }));
+
+  const addBank = () => {
+    const name = newBankName.trim();
+    const account = newBankAccount.trim();
+    if (!name) return;
+    setBanks([...banks, { name, account }]);
+    setNewBankName(""); setNewBankAccount("");
+  };
 
   return (
     <div>
@@ -64,16 +81,18 @@ export default function Settings() {
 
         <Card><CardHeader><CardTitle>Accepted Banks</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex gap-2">
-              <Input placeholder="Add bank name…" value={newBank} onChange={(e) => setNewBank(e.target.value)} />
-              <Button onClick={() => { if (newBank.trim()) { setBanks([...banks, newBank.trim()]); setNewBank(""); } }}>
-                <Plus className="h-4 w-4" /> Add
-              </Button>
+            <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+              <Input placeholder="Bank name (e.g. CBE)" value={newBankName} onChange={(e) => setNewBankName(e.target.value)} />
+              <Input placeholder="Account number" value={newBankAccount} onChange={(e) => setNewBankAccount(e.target.value)} />
+              <Button onClick={addBank}><Plus className="h-4 w-4" /> Add</Button>
             </div>
             <div className="space-y-2">
               {banks.map((b, i) => (
                 <div key={i} className="flex items-center justify-between border rounded p-2 text-sm">
-                  <span>{b}</span>
+                  <div>
+                    <div className="font-medium">{b.name}</div>
+                    <div className="text-xs text-muted-foreground">Account: {b.account || "—"}</div>
+                  </div>
                   <Button variant="ghost" size="icon" onClick={() => setBanks(banks.filter((_, j) => j !== i))}>
                     <Trash2 className="h-4 w-4" />
                   </Button>

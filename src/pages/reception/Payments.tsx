@@ -19,10 +19,19 @@ import { useReactToPrint } from "react-to-print";
 import { toast } from "sonner";
 import { Printer, CheckCircle2 } from "lucide-react";
 
+type Bank = { name: string; account: string };
+
+function normalizeBanks(raw: any): Bank[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((b: any) => typeof b === "string" ? { name: b, account: "" } : { name: b?.name ?? "", account: b?.account ?? "" })
+    .filter((b) => b.name);
+}
+
 export default function Payments() {
   const { user } = useAuth();
   const { settings } = useSettings();
-  const banks: string[] = (settings.banks as string[]) || [];
+  const banks: Bank[] = normalizeBanks(settings.banks);
 
   const [rows, setRows] = useState<any[]>([]);
   const [filter, setFilter] = useState("pending");
@@ -33,6 +42,8 @@ export default function Payments() {
   const [ref, setRef] = useState("");
   const ref0 = useRef<HTMLDivElement>(null);
   const print = useReactToPrint({ contentRef: ref0 });
+
+  const selectedBank = banks.find((b) => b.name === bank);
 
   const load = async () => {
     let q = supabase.from("payments")
@@ -171,12 +182,20 @@ export default function Payments() {
                     <SelectTrigger><SelectValue placeholder="Select bank…" /></SelectTrigger>
                     <SelectContent>
                       {banks.length === 0 && <SelectItem value="Other">Other</SelectItem>}
-                      {banks.map((b) => <SelectItem key={b} value={b}>{b}</SelectItem>)}
+                      {banks.map((b) => (
+                        <SelectItem key={b.name} value={b.name}>
+                          {b.name}{b.account ? ` — Account: ${b.account}` : ""}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
+                  {selectedBank?.account && (
+                    <div className="text-xs text-muted-foreground">Account: {selectedBank.account}</div>
+                  )}
                 </div>
                 <div className="space-y-1"><Label>Reference</Label>
-                  <Input value={ref} onChange={(e) => setRef(e.target.value)} /></div>
+                  <Input value={ref} onChange={(e) => setRef(e.target.value)}
+                    placeholder={selectedBank?.account ? `Transfer ref to ${selectedBank.account}` : "Transaction reference"} /></div>
               </>
             )}
           </div>
@@ -202,7 +221,7 @@ export default function Payments() {
                   ))}
                 </div>
                 <div className="mt-3 text-lg flex justify-between border-t pt-2"><b>Total</b> <b>{fmtETB(receipt.total_amount)}</b></div>
-                <div className="text-xs text-muted-foreground">Method: {receipt.method}{receipt.bank_name ? ` · ${receipt.bank_name} · ${receipt.transfer_ref}` : ""}</div>
+                <div className="text-xs text-muted-foreground">Method: {receipt.method}{receipt.bank_name ? ` · Bank: ${receipt.bank_name}${banks.find(b => b.name === receipt.bank_name)?.account ? ` · Account: ${banks.find(b => b.name === receipt.bank_name)?.account}` : ""} · Ref: ${receipt.transfer_ref}` : ""}</div>
                 {settings.receipt_footer && <div className="text-center text-xs text-muted-foreground mt-4">{settings.receipt_footer}</div>}
               </div>
             </div>

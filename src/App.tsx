@@ -34,6 +34,7 @@ import AdminServices from "@/pages/admin/Services";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminAudit from "@/pages/admin/Audit";
 import AdminReports from "@/pages/admin/Reports";
+import AdminPayments from "@/pages/admin/Payments";
 
 const ALL_ROLES: Role[] = ["admin", "reception", "opd", "laboratory", "treatment", "pharmacy"];
 
@@ -132,6 +133,7 @@ export default function App() {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/services" element={<AdminServices />} />
+          <Route path="/admin/payments" element={<AdminPayments />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/audit" element={<AdminAudit />} />

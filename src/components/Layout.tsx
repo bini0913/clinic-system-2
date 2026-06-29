@@ -47,6 +47,7 @@ const NAV: Record<Role, { to: string; label: string; icon: any; badge?: string }
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
     { to: "/admin/users", label: "Users", icon: Users },
     { to: "/admin/services", label: "Service Catalogue", icon: FileText },
+    { to: "/admin/payments", label: "Payments", icon: CreditCard },
     { to: "/admin/settings", label: "Clinic Settings", icon: Settings },
     { to: "/admin/reports", label: "Reports", icon: BarChart3 },
     { to: "/admin/audit", label: "Audit Logs", icon: ShieldCheck },

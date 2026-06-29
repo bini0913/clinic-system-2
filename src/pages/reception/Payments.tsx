@@ -221,7 +221,7 @@ export default function Payments() {
                   ))}
                 </div>
                 <div className="mt-3 text-lg flex justify-between border-t pt-2"><b>Total</b> <b>{fmtETB(receipt.total_amount)}</b></div>
-                <div className="text-xs text-muted-foreground">Method: {receipt.method}{receipt.bank_name ? ` · ${receipt.bank_name} · ${receipt.transfer_ref}` : ""}</div>
+                <div className="text-xs text-muted-foreground">Method: {receipt.method}{receipt.bank_name ? ` · Bank: ${receipt.bank_name}${banks.find(b => b.name === receipt.bank_name)?.account ? ` · Account: ${banks.find(b => b.name === receipt.bank_name)?.account}` : ""} · Ref: ${receipt.transfer_ref}` : ""}</div>
                 {settings.receipt_footer && <div className="text-center text-xs text-muted-foreground mt-4">{settings.receipt_footer}</div>}
               </div>
             </div>

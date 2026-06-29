@@ -34,6 +34,7 @@ import AdminServices from "@/pages/admin/Services";
 import AdminSettings from "@/pages/admin/Settings";
 import AdminAudit from "@/pages/admin/Audit";
 import AdminReports from "@/pages/admin/Reports";
+import AdminPayments from "@/pages/admin/Payments";
 
 const ALL_ROLES: Role[] = ["admin", "reception", "opd", "laboratory", "treatment", "pharmacy"];
 

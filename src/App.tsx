@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import type { Role } from "@/lib/supabase";
 import Login from "@/pages/Login";
@@ -37,12 +37,12 @@ import AdminReports from "@/pages/admin/Reports";
 
 const ALL_ROLES: Role[] = ["admin", "reception", "opd", "laboratory", "treatment", "pharmacy"];
 
-function Protected({ roles, children }: { roles: Role[]; children: React.ReactElement }) {
+function Protected({ roles, children }: { roles: Role[]; children?: React.ReactElement }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="p-8">Loading…</div>;
   if (!user) return <Navigate to="/login" replace />;
   if (!roles.includes(user.role)) return <Navigate to={`/${user.role}`} replace />;
-  return children;
+  return children ?? <Outlet />;
 }
 
 function HomeRedirect() {
@@ -75,53 +75,67 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/display" element={<Display />} />
 
-      <Route element={<Protected roles={ALL_ROLES}><Layout /></Protected>}>
-        <Route path="/patient/:patientId" element={<PatientProfile />} />
+      <Route element={<Protected roles={ALL_ROLES} />}>
+        <Route element={<Layout />}>
+          <Route path="/patient/:patientId" element={<PatientProfile />} />
+        </Route>
       </Route>
 
-      <Route element={<Protected roles={["reception"]}><Layout /></Protected>}>
-        <Route path="/reception" element={<ReceptionDashboard />} />
-        <Route path="/reception/register" element={<ReceptionRegister />} />
-        <Route path="/reception/patients" element={<ReceptionPatients />} />
-        <Route path="/reception/appointments" element={<ReceptionAppointments />} />
-        <Route path="/reception/queue" element={<ReceptionQueue />} />
-        <Route path="/reception/payments" element={<ReceptionPayments />} />
-        <Route path="/reception/activity" element={<ReceptionActivity />} />
+      <Route element={<Protected roles={["reception"]} />}>
+        <Route element={<Layout />}>
+          <Route path="/reception" element={<ReceptionDashboard />} />
+          <Route path="/reception/register" element={<ReceptionRegister />} />
+          <Route path="/reception/patients" element={<ReceptionPatients />} />
+          <Route path="/reception/appointments" element={<ReceptionAppointments />} />
+          <Route path="/reception/queue" element={<ReceptionQueue />} />
+          <Route path="/reception/payments" element={<ReceptionPayments />} />
+          <Route path="/reception/activity" element={<ReceptionActivity />} />
+        </Route>
       </Route>
 
-      <Route element={<Protected roles={["opd"]}><Layout /></Protected>}>
-        <Route path="/opd" element={<OPDDashboard />} />
-        <Route path="/opd/queue" element={<OPDQueue />} />
-        <Route path="/opd/lab-results" element={<OPDLabResultQueue />} />
-        <Route path="/opd/visit/:id" element={<OPDVisit />} />
-        <Route path="/opd/activity" element={<OPDActivity />} />
+      <Route element={<Protected roles={["opd"]} />}>
+        <Route element={<Layout />}>
+          <Route path="/opd" element={<OPDDashboard />} />
+          <Route path="/opd/queue" element={<OPDQueue />} />
+          <Route path="/opd/lab-results" element={<OPDLabResultQueue />} />
+          <Route path="/opd/visit/:id" element={<OPDVisit />} />
+          <Route path="/opd/activity" element={<OPDActivity />} />
+        </Route>
       </Route>
 
-      <Route element={<Protected roles={["laboratory"]}><Layout /></Protected>}>
-        <Route path="/lab" element={<LabDashboard />} />
-        <Route path="/lab/visit/:id" element={<LabVisit />} />
-        <Route path="/lab/activity" element={<LabActivity />} />
+      <Route element={<Protected roles={["laboratory"]} />}>
+        <Route element={<Layout />}>
+          <Route path="/lab" element={<LabDashboard />} />
+          <Route path="/lab/visit/:id" element={<LabVisit />} />
+          <Route path="/lab/activity" element={<LabActivity />} />
+        </Route>
       </Route>
 
-      <Route element={<Protected roles={["treatment"]}><Layout /></Protected>}>
-        <Route path="/treatment" element={<TreatmentDashboard />} />
-        <Route path="/treatment/visit/:id" element={<TreatmentVisit />} />
-        <Route path="/treatment/activity" element={<TreatmentActivity />} />
+      <Route element={<Protected roles={["treatment"]} />}>
+        <Route element={<Layout />}>
+          <Route path="/treatment" element={<TreatmentDashboard />} />
+          <Route path="/treatment/visit/:id" element={<TreatmentVisit />} />
+          <Route path="/treatment/activity" element={<TreatmentActivity />} />
+        </Route>
       </Route>
 
-      <Route element={<Protected roles={["pharmacy"]}><Layout /></Protected>}>
-        <Route path="/pharmacy" element={<PharmacyDashboard />} />
-        <Route path="/pharmacy/visit/:id" element={<PharmacyVisit />} />
-        <Route path="/pharmacy/activity" element={<PharmacyActivity />} />
+      <Route element={<Protected roles={["pharmacy"]} />}>
+        <Route element={<Layout />}>
+          <Route path="/pharmacy" element={<PharmacyDashboard />} />
+          <Route path="/pharmacy/visit/:id" element={<PharmacyVisit />} />
+          <Route path="/pharmacy/activity" element={<PharmacyActivity />} />
+        </Route>
       </Route>
 
-      <Route element={<Protected roles={["admin"]}><Layout /></Protected>}>
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/services" element={<AdminServices />} />
-        <Route path="/admin/settings" element={<AdminSettings />} />
-        <Route path="/admin/reports" element={<AdminReports />} />
-        <Route path="/admin/audit" element={<AdminAudit />} />
+      <Route element={<Protected roles={["admin"]} />}>
+        <Route element={<Layout />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/services" element={<AdminServices />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
+          <Route path="/admin/audit" element={<AdminAudit />} />
+        </Route>
       </Route>
 
       <Route path="/" element={<RootRedirect />} />
